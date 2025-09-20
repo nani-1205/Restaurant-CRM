@@ -5,7 +5,5 @@ module.exports = withModuleFederationPlugin({
   exposes: {
     './PosModule': './src/app/pos/pos.module.ts',
   },
-  shared: {
-    ...shareAll({ singleton: true, strictVersion: true, requiredVersion: 'auto' }),
-  },
+  shared: { ...shareAll({ singleton: true, strictVersion: true, requiredVersion: 'auto' }) },
 });

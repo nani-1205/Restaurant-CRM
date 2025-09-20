@@ -1,1 +1,25 @@
-<script src="http://localhost:4202/remoteEntry.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+  <head><meta charset="utf-8" /><title>React App</title></head>
+  <body><div id="root"></div></body>
+</html>```
+
+#### `frontend/micro-frontends/dashboard-mfe-react/src/index.js`
+```javascript
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './index.css';
+
+const mount = (el) => {
+  const root = ReactDOM.createRoot(el);
+  root.render(<React.StrictMode><App /></React.StrictMode>);
+};
+
+if (process.env.NODE_ENV === 'development') {
+  const devRoot = document.getElementById('root');
+  if (devRoot) mount(devRoot);
+}
+
+export { mount };
+export class DashboardModule {} // Dummy class for Angular loader

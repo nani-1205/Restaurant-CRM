@@ -5,7 +5,6 @@
   "projects": {
     "shell-app-angular": {
       "projectType": "application",
-      "schematics": {},
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -16,17 +15,10 @@
             "outputPath": "dist/shell-app-angular",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.css"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.css"],
             "scripts": []
           },
           "configurations": {
@@ -34,24 +26,12 @@
               "budgets": [{"type": "initial", "maximumWarning": "500kb", "maximumError": "1mb"}],
               "outputHashing": "all"
             },
-            "development": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true
-            }
+            "development": {}
           },
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "configurations": {
-            "production": {"browserTarget": "shell-app-angular:build:production"},
-            "development": {"browserTarget": "shell-app-angular:build:development"}
-          },
-          "defaultConfiguration": "development"
+          "builder": "@angular-devkit/build-angular:dev-server"
         }
       }
     }
