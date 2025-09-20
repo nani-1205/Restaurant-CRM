@@ -40,7 +40,7 @@ services:
   api-gateway:
     image: my-registry/api-gateway:latest # Your built API Gateway image
     env_file:
-      - ../backend/.env# Loads environment variables for service URLs
+      - ../backend/.env # Loads environment variables for service URLs
     networks:
       - app-net
     deploy:
