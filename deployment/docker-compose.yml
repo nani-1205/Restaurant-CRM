@@ -1,7 +1,7 @@
 version: '3.8'
 
-# This file orchestrates the entire Restaurant CRM application stack for Docker Swarm.
-# It defines all services, networks, volumes, and deployment strategies.
+# This is the complete Docker Compose file for deploying the Restaurant-CRM stack to Docker Swarm.
+# It is designed to be run from within the 'deployment' directory.
 
 services:
 
@@ -9,10 +9,8 @@ services:
   #--- REVERSE PROXY (INGRESS)  ---#
   #--------------------------------#
   nginx:
-    image: my-registry/nginx-proxy:latest # Your custom Nginx image with the config file
+    image: my-registry/nginx-proxy:latest # Your custom Nginx image
     ports:
-      # Expose HTTP and HTTPS ports to the host network
-      # This is the single entry point for all external traffic.
       - target: 80
         published: 80
         protocol: tcp
@@ -24,13 +22,12 @@ services:
     networks:
       - app-net
     secrets:
-      # Securely mounts the SSL certificates from Docker Swarm secrets
-      - source: ssl_cert # Name of the secret on the Swarm manager
-        target: /etc/letsencrypt/live/sparkdevop.com/fullchain.pem # Path inside the container
+      - source: ssl_cert
+        target: /etc/letsencrypt/live/sparkdevop.com/fullchain.pem
       - source: ssl_key
         target: /etc/letsencrypt/live/sparkdevop.com/privkey.pem
     deploy:
-      mode: global # Ensures one Nginx instance runs on every node for high availability
+      mode: global
       restart_policy:
         condition: on-failure
 
@@ -39,15 +36,16 @@ services:
   #-----------------------------#
   api-gateway:
     image: my-registry/api-gateway:latest # Your built API Gateway image
+    # The .env file is located at ../backend/.env relative to this compose file
     env_file:
-      - ../backend/.env # Loads environment variables for service URLs
+      - ../backend/.env
     networks:
       - app-net
     deploy:
-      replicas: 2 # Run two instances for availability and load balancing
+      replicas: 2
       placement:
         constraints:
-          - node.labels.role == gateway-host # Constrain to specific nodes as requested
+          - node.labels.role == gateway-host
       restart_policy:
         condition: on-failure
       update_config:
@@ -62,7 +60,7 @@ services:
       replicas: 2
       placement:
         constraints:
-          - node.labels.role == gateway-host # Constrain to specific nodes
+          - node.labels.role == gateway-host
       restart_policy:
         condition: on-failure
       update_config:
@@ -75,7 +73,7 @@ services:
   user-service:
     image: my-registry/user-service:latest
     env_file:
-      - ./backend/.env
+      - ../backend/.env
     networks:
       - app-net
     depends_on:
@@ -84,14 +82,11 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
-      update_config:
-        parallelism: 1
-        delay: 10s
 
   order-service:
     image: my-registry/order-service:latest
     env_file:
-      - ./backend/.env
+      - ../backend/.env
     networks:
       - app-net
     depends_on:
@@ -100,25 +95,19 @@ services:
       replicas: 2
       restart_policy:
         condition: on-failure
-      update_config:
-        parallelism: 1
-        delay: 10s
 
   reporting-service:
     image: my-registry/reporting-service:latest
     env_file:
-      - ./backend/.env
+      - ../backend/.env
     networks:
       - app-net
     depends_on:
       - postgres
     deploy:
-      replicas: 1 # Reporting might not need as many replicas initially
+      replicas: 1
       restart_policy:
         condition: on-failure
-      update_config:
-        parallelism: 1
-        delay: 10s
 
   #--------------------------#
   #--- DATA STORES        ---#
@@ -126,18 +115,18 @@ services:
   postgres:
     image: postgres:14-alpine
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-admin}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-supersecret}
-      POSTGRES_DB: ${POSTGRES_DB:-restaurant_db}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - postgres-data:/var/lib/postgresql/data # Persist database data
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - app-net
     deploy:
       replicas: 1
       placement:
         constraints:
-          - node.role == manager # Place the DB on a manager node for stability
+          - node.role == manager
       restart_policy:
         condition: on-failure
 
@@ -158,14 +147,13 @@ services:
 #--------------------------#
 networks:
   app-net:
-    driver: overlay # Overlay network is required for Swarm mode communication across nodes
+    driver: overlay
     attachable: true
 
 volumes:
-  postgres-data: # Defines the named volume for PostgreSQL data
+  postgres-data:
 
 secrets:
-  # Declares that we are using pre-existing secrets from the Docker Swarm manager
   ssl_cert:
     external: true
   ssl_key:
