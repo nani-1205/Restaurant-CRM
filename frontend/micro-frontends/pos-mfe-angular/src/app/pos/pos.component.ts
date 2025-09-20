@@ -1,22 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 
-// Interfaces for our data structures
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image_url: string;
-}
-
-interface CartItem {
-  product: Product;
-  quantity: number;
-}
+interface Product { id: number; name: string; price: number; image_url: string; }
+interface CartItem { product: Product; quantity: number; }
 
 @Component({
   selector: 'app-pos',
   templateUrl: './pos.component.html',
-  styleUrls: ['./pos.component.css']
+  // You can add styles in a separate file if needed
 })
 export class PosComponent implements OnInit {
   products: Product[] = [];
@@ -25,13 +15,16 @@ export class PosComponent implements OnInit {
   total = 0;
 
   ngOnInit(): void {
-    // In a real app, this would come from an API call
+    // In a real app, this would be from an API call
     this.products = [
-      { id: 1, name: 'Shrimp Basil Salad', price: 10.00, image_url: 'https://via.placeholder.com/150/FFC0CB/000000?Text=Salad' },
-      { id: 2, name: 'Onion Rings', price: 10.00, image_url: 'https://via.placeholder.com/150/FFA500/000000?Text=Rings' },
-      { id: 3, name: 'Chicken Burger', price: 10.00, image_url: 'https://via.placeholder.com/150/800080/FFFFFF?Text=Burger' },
-      { id: 4, name: 'Beef Burger', price: 10.00, image_url: 'https://via.placeholder.com/150/A52A2A/FFFFFF?Text=Burger' },
-      // ... Add more mock products
+      { id: 1, name: 'Shrimp Basil Salad', price: 12.50, image_url: 'https://i.imgur.com/gC5aIuK.png' },
+      { id: 2, name: 'Onion Rings', price: 6.00, image_url: 'https://i.imgur.com/Y43qP6N.png' },
+      { id: 3, name: 'Smoked Bacon', price: 8.00, image_url: 'https://i.imgur.com/k2Aa551.png' },
+      { id: 4, name: 'Fresh Tomatoes', price: 4.50, image_url: 'https://i.imgur.com/yO8zW8D.png' },
+      { id: 5, name: 'Chicken Burger', price: 14.00, image_url: 'https://i.imgur.com/1G2xv2u.png' },
+      { id: 6, name: 'Red Onion Rings', price: 6.50, image_url: 'https://i.imgur.com/tL44G7A.png' },
+      { id: 7, name: 'Beef Burger', price: 15.50, image_url: 'https://i.imgur.com/WlO3611.png' },
+      { id: 8, name: 'Grilled Burger', price: 15.00, image_url: 'https://i.imgur.com/V9K242O.png' },
     ];
   }
 
@@ -55,7 +48,6 @@ export class PosComponent implements OnInit {
 
   calculateTotals(): void {
     this.subTotal = this.cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
-    // Add logic for tax, discounts etc. here
-    this.total = this.subTotal;
+    this.total = this.subTotal; // Add tax/discount logic here
   }
 }

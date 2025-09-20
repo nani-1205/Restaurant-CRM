@@ -31,18 +31,7 @@
           },
           "configurations": {
             "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
-                }
-              ],
+              "budgets": [{"type": "initial", "maximumWarning": "500kb", "maximumError": "1mb"}],
               "outputHashing": "all"
             },
             "development": {
@@ -59,12 +48,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
-            "production": {
-              "browserTarget": "shell-app-angular:build:production"
-            },
-            "development": {
-              "browserTarget": "shell-app-angular:build:development"
-            }
+            "production": {"browserTarget": "shell-app-angular:build:production"},
+            "development": {"browserTarget": "shell-app-angular:build:development"}
           },
           "defaultConfiguration": "development"
         }

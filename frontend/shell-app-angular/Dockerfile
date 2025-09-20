@@ -11,7 +11,7 @@ RUN npm run build -- --configuration production
 FROM nginx:1.25-alpine
 # Copy the built artifacts from the 'build' stage
 COPY --from=build /usr/src/app/dist/shell-app-angular /usr/share/nginx/html
-# If you have a custom nginx config, copy it here
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy a custom nginx config to handle SPA routing
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
