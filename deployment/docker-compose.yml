@@ -1,7 +1,7 @@
 version: '3.8'
 
-# This is the complete Docker Compose file for deploying the Restaurant-CRM stack to Docker Swarm.
-# It is designed to be run from within the 'deployment' directory.
+# This is the complete and corrected Docker Compose file for the Restaurant-CRM stack.
+# The key fix is in the 'postgres' service, which now uses 'env_file' to load its credentials.
 
 services:
 
@@ -36,7 +36,6 @@ services:
   #-----------------------------#
   api-gateway:
     image: my-registry/api-gateway:latest # Your built API Gateway image
-    # The .env file is located at ../backend/.env relative to this compose file
     env_file:
       - ../backend/.env
     networks:
@@ -112,12 +111,12 @@ services:
   #--------------------------#
   #--- DATA STORES        ---#
   #--------------------------#
-postgres:
+  postgres:
     image: postgres:14-alpine
+    # CORRECTED: Use env_file to securely load credentials from the .env file.
+    # This resolves the "superuser password is not specified" error.
     env_file:
-      - ../backend/.env # Add this line
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - ../backend/.env
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
