@@ -16,11 +16,15 @@
             "main": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
-            "assets": ["src/favicon.ico"],
+            "assets": ["src/favicon.ico", "src/assets"],
             "styles": ["src/styles.css"],
             "scripts": []
           },
-          "configurations": { "production": { "outputHashing": "all" } }
+          "configurations": {
+            "production": {
+              "outputHashing": "all"
+            }
+          }
         }
       }
     }
