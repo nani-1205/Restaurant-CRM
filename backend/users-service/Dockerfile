@@ -7,7 +7,7 @@ RUN npm install
 
 COPY . .
 
-# The gateway listens on port 3000
-EXPOSE 3000
+# Users service listens on port 3001
+EXPOSE 3001
 
 CMD ["npm", "start"]

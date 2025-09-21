@@ -7,7 +7,7 @@ RUN npm install
 
 COPY . .
 
-# The gateway listens on port 3000
-EXPOSE 3000
+# Orders service listens on port 3002
+EXPOSE 3002
 
 CMD ["npm", "start"]

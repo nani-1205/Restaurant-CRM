@@ -7,7 +7,7 @@ RUN npm install
 
 COPY . .
 
-# The gateway listens on port 3000
-EXPOSE 3000
+# Analytics service listens on port 3003
+EXPOSE 3003
 
 CMD ["npm", "start"]
