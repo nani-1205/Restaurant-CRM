@@ -1,16 +1,16 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PosComponent } from './pos.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: PosComponent
+    // This now correctly points to the pos.module inside the pos folder
+    loadChildren: () => import('./pos/pos.module').then(m => m.PosModule)
   }
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class PosRoutingModule {}
+export class AppRoutingModule { }
