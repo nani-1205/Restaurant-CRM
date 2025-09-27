@@ -1,6 +1,7 @@
 from app import create_app, db
 from app.models import Table, MenuItem
 from flask_migrate import upgrade
+import random  # <--- ADD THIS LINE
 
 app = create_app()
 
