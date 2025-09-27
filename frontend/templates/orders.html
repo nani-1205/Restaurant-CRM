@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Orders - Restaurant CRM{% endblock %}
+{% block header %}Order Tracking{% endblock %}
+
+{% block content %}
+<div class="card full-width-card">
+    <div class="card-header">
+        <h3>Recent Orders</h3>
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Timestamp</th>
+                <th>Total Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="orders-table-body">
+            <!-- Order data will be injected here -->
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', loadOrders);
+</script>
+{% endblock %}
