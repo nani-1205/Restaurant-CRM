@@ -1,6 +1,7 @@
 Flask==2.2.2
+Werkzeug==2.3.8
 Flask-SQLAlchemy==3.0.3
 Flask-Migrate==4.0.4
 psycopg2-binary==2.9.5
 python-dotenv==0.21.0
-Flask-Cors==3.0.10  # Important for allowing frontend to talk to backend
+Flask-Cors==3.0.10
