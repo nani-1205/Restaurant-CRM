@@ -1,136 +1,41 @@
-# Filename: docker-compose.yml
 version: '3.8'
 
 services:
-  # -------------------------------------------
-  # REVERSE PROXY & LOAD BALANCER
-  # -------------------------------------------
-  nginx:
-    # We build our custom nginx config
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-      - "443:443"
+  web:
+    build: .
+    command: gunicorn --bind 0.0.0.0:5000 "app:create_app()"
     volumes:
-      # Mount your SSL certs from the host machine into the container
-      # You must obtain these certs for your domain 'sparkdevop.com'
-      - /path/to/your/certs/fullchain.pem:/etc/nginx/ssl/fullchain.pem:ro
-      - /path/to/your/certs/privkey.pem:/etc/nginx/ssl/privkey.pem:ro
-    networks:
-      - app-net
-    deploy:
-      mode: global
-      placement:
-        constraints: [node.role == manager]
+      - ./project:/app
+    expose:
+      - 5000
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
 
-  # -------------------------------------------
-  # DATABASES & CACHING
-  # -------------------------------------------
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+  db:
+    image: postgres:14-alpine
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - app-net
-    deploy:
-      replicas: 1
-      placement:
-        constraints: [node.role == manager]
-      restart_policy:
-        condition: on-failure
-
-  redis:
-    image: redis:7-alpine
-    networks:
-      - app-net
-    deploy:
-      replicas: 1
-      placement:
-        constraints: [node.role == manager]
-      restart_policy:
-        condition: on-failure
-
-  # -------------------------------------------
-  # BACKEND MICROSERVICES
-  # -------------------------------------------
-  api-gateway:
-    image: your-repo/api-gateway:latest # IMPORTANT: Replace with your actual image
-    networks:
-      - app-net
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 1
-        delay: 10s
-      restart_policy:
-        condition: on-failure
-
-  orders-service:
-    image: your-repo/orders-service:latest # IMPORTANT: Replace with your actual image
+      - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
-      - REDIS_URL=redis://redis:6379
-    networks:
-      - app-net
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80" # Change to "443:443" for HTTPS
     depends_on:
-      - postgres
-      - redis
-    deploy:
-      replicas: 2
-      restart_policy:
-        condition: on-failure
+      - web
 
-  # --- Add other backend services (users, analytics) here following the same pattern ---
-
-  # -------------------------------------------
-  # MICRO-FRONTENDS
-  # -------------------------------------------
-  container-app:
-    image: your-repo/container-app:latest # IMPORTANT: Replace with your actual image
-    networks:
-      - app-net
-    deploy:
-      replicas: 2
-      placement:
-        constraints:
-          - node.labels.hostname == master-1
-          - node.labels.hostname == master-2
-
-  pos-mfe:
-    image: your-repo/pos-mfe:latest # IMPORTANT: Replace with your actual image
-    networks:
-      - app-net
-    deploy:
-      replicas: 2
-
-  dashboard-mfe:
-    image: your-repo/dashboard-mfe:latest # IMPORTANT: Replace with your actual image
-    networks:
-      - app-net
-    deploy:
-      replicas: 2
-
-  employees-mfe:
-    image: your-repo/employees-mfe:latest # IMPORTANT: Replace with your actual image
-    networks:
-      - app-net
-    deploy:
-      replicas: 2
-
-# Define shared resources
 volumes:
-  postgres-data:
-    driver: local
-
-networks:
-  app-net:
-    driver: overlay
-    attachable: true
+  postgres_data:

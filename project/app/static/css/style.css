@@ -1,0 +1,54 @@
+body {
+    overflow-x: hidden;
+    background-color: #f8f9fa;
+}
+
+#wrapper {
+    display: flex;
+}
+
+#sidebar-wrapper {
+    min-height: 100vh;
+    width: 250px;
+    transition: margin .25s ease-out;
+}
+
+#page-content-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
+.sidebar-heading {
+    padding: 0.875rem 1.25rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.list-group-item.active {
+    background-color: #495057 !important;
+    border-color: #495057 !important;
+}
+
+/* Table Management Styles */
+.table-card {
+    width: 120px;
+    height: 80px;
+    border: 2px solid;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+.table-card:hover {
+    transform: scale(1.05);
+}
+.table-card .table-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.table-card .table-capacity {
+    font-size: 0.8rem;
+}
+
+.status-Available { border-color: #198754; color: #198754; }
+.status-Reserved { border-color: #ffc107; color: #ffc107; }
+.status-Occupied { border-color: #dc3545; color: #dc3545; }
