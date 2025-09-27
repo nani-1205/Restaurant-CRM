@@ -22,10 +22,12 @@ def create_app(config_class=Config):
     from .api.tables import tables_bp
     from .api.orders import orders_bp
     from .api.dashboard import dashboard_bp
+    from .api.menu import menu_bp # <-- IMPORT NEW BLUEPRINT
     
     app.register_blueprint(tables_bp, url_prefix='/api/tables')
     app.register_blueprint(orders_bp, url_prefix='/api/orders')
     app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
+    app.register_blueprint(menu_bp, url_prefix='/api/menu') # <-- REGISTER NEW BLUEPRINT
 
     # Main Routes for Frontend
     @app.route('/')
@@ -35,6 +37,12 @@ def create_app(config_class=Config):
     @app.route('/tables')
     def tables_page():
         return render_template('tables.html', title='Table Management')
+
+    # <-- ADD THIS NEW ROUTE -->
+    @app.route('/order/<int:table_id>')
+    def order_page(table_id):
+        # You could add logic here to check if the table exists
+        return render_template('order.html', title=f'Order for Table {table_id}', table_id=table_id)
 
     # Error Handlers
     @app.errorhandler(404)

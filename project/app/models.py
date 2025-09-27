@@ -19,6 +19,12 @@ class Table(db.Model):
     capacity = db.Column(db.Integer, nullable=False, default=4)
     status = db.Column(db.Enum(TableStatus), nullable=False, default=TableStatus.AVAILABLE)
     
+    # Add this relationship to easily find the active order
+    active_order = db.relationship('Order',
+                                   primaryjoin="and_(Table.id==Order.table_id, Order.status.in_(['Pending', 'In Progress']))",
+                                   uselist=False,
+                                   back_populates='table')
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -34,6 +40,15 @@ class MenuItem(db.Model):
     price = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(50), nullable=False)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "price": self.price,
+            "category": self.category,
+            "description": self.description
+        }
+
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     table_id = db.Column(db.Integer, db.ForeignKey('table.id'), nullable=False)
@@ -41,7 +56,7 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
     total_price = db.Column(db.Float, default=0.0)
     
-    table = db.relationship('Table', backref=db.backref('orders', lazy=True))
+    table = db.relationship('Table', back_populates='active_order')
     items = db.relationship('OrderItem', backref='order', lazy='dynamic', cascade="all, delete-orphan")
 
 class OrderItem(db.Model):
