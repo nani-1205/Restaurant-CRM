@@ -1,9 +1,86 @@
-body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+:root {
+    --color-available: #d1e7dd;
+    --color-available-border: #a3cfbb;
+    --color-occupied: #f8d7da;
+    --color-occupied-border: #f1aeb5;
+    --color-reserved: #cfe2ff;
+    --color-reserved-border: #a9c7fe;
+    --color-selected-border: #6f42c1;
 }
 
-main {
-    flex: 1;
+body {
+    padding-bottom: 80px; /* Space for the bottom bar */
+}
+
+/* Table Layout Grid */
+.table-layout-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr); /* A 12-column grid */
+    grid-template-rows: repeat(8, 70px);   /* 8 rows, each 70px high */
+    gap: 15px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.table-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 3px solid transparent;
+    border-radius: 12px;
+}
+.table-container:not(.disabled):hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.table-container.selected {
+    border-color: var(--color-selected-border);
+    background-color: rgba(111, 66, 193, 0.1);
+}
+.table-container.disabled {
+    cursor: not-allowed;
+}
+
+.table-shape {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #333;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Shapes */
+.table-shape.square, .table-shape.rectangle { border-radius: 8px; }
+.table-shape.circle { border-radius: 50%; }
+.table-shape.oval { border-radius: 50%; }
+
+/* Status Colors */
+.text-available { color: #198754; }
+.text-occupied { color: #dc3545; }
+.text-reserved { color: #0d6efd; }
+
+.status-available .table-shape { background-color: var(--color-available); border-color: var(--color-available-border); }
+.status-occupied .table-shape { background-color: var(--color-occupied); border-color: var(--color-occupied-border); }
+.status-reserved .table-shape { background-color: var(--color-reserved); border-color: var(--color-reserved-border); }
+
+/* Bottom Bar */
+.order-summary-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background-color: #fff;
+    border-top: 1px solid #dee2e6;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 1000;
 }

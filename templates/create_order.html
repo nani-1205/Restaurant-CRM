@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Create Order{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Finalize Order</h1>
+<div class="card">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('create_order') }}">
+            <input type="hidden" name="table_ids" value="{{ table_ids_str }}">
+            
+            <h4>Order for Table(s): 
+                {% for table in tables %}
+                    <span class="badge bg-primary fs-5">{{ table.name }}</span>
+                {% endfor %}
+            </h4>
+            <hr>
+
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">Assign to Employee</label>
+                    <select class="form-select" name="employee_id" required>
+                        <option value="" disabled selected>Select an employee</option>
+                        {% for employee in employees %}
+                        <option value="{{ employee.id }}">{{ employee.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <hr>
+            <h5>Select Items</h5>
+            <div style="max-height: 400px; overflow-y: auto;">
+                {% for item in menu_items %}
+                <div class="input-group mb-2">
+                    <span class="input-group-text" style="width: 300px;">{{ item.name }} (${{ "%.2f"|format(item.price) }})</span>
+                    <input type="hidden" name="menu_item_id[]" value="{{ item.id }}">
+                    <input type="number" class="form-control" name="quantity[]" min="0" value="0" placeholder="Quantity">
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="mt-4 text-end">
+                <a href="{{ url_for('add_order_layout') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-success btn-lg">Create Order</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

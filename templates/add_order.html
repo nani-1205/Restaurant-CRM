@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Add Order - Choose Table{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Choose a Table</h1>
+<div class="card">
+    <div class="card-header d-flex justify-content-end">
+        <span class="me-3"><i class="bi bi-circle-fill text-available"></i> Available</span>
+        <span class="me-3"><i class="bi bi-circle-fill text-occupied"></i> Occupied</span>
+        <span class="me-3"><i class="bi bi-circle-fill text-reserved"></i> Reserved</span>
+    </div>
+    <div class="card-body">
+        <div class="table-layout-grid">
+            {% for table in tables %}
+            <div class="table-container status-{{ table.status|lower }} {% if table.status != 'Available' %}disabled{% endif %}" 
+                 style="grid-column: {{ table.pos_x }} / span {{ table.span_x }}; grid-row: {{ table.pos_y }} / span {{ table.span_y }};"
+                 data-table-id="{{ table.id }}"
+                 data-table-name="{{ table.name }}">
+                <div class="table-shape {{ table.shape }}">
+                    {{ table.name }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="order-summary-bar">
+    <div class="container-fluid d-flex justify-content-between align-items-center h-100">
+        <div>
+            <strong>Selected Tables:</strong>
+            <span id="selected-tables-list">None</span>
+        </div>
+        <form id="place-order-form" action="{{ url_for('create_order') }}" method="GET">
+            <input type="hidden" name="tables" id="selected-tables-input">
+            <button type="submit" class="btn btn-primary btn-lg" id="place-order-btn" disabled>
+                <i class="bi bi-arrow-right-circle"></i> Place Order
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tables = document.querySelectorAll('.table-container');
+    const selectedList = document.getElementById('selected-tables-list');
+    const selectedInput = document.getElementById('selected-tables-input');
+    const placeOrderBtn = document.getElementById('place-order-btn');
+
+    let selectedTables = new Map();
+
+    tables.forEach(table => {
+        if (table.classList.contains('disabled')) return;
+
+        table.addEventListener('click', () => {
+            const tableId = table.dataset.tableId;
+            const tableName = table.dataset.tableName;
+
+            if (selectedTables.has(tableId)) {
+                selectedTables.delete(tableId);
+                table.classList.remove('selected');
+            } else {
+                selectedTables.set(tableId, tableName);
+                table.classList.add('selected');
+            }
+            updateSummary();
+        });
+    });
+
+    function updateSummary() {
+        if (selectedTables.size === 0) {
+            selectedList.textContent = 'None';
+            placeOrderBtn.disabled = true;
+        } else {
+            const tableNames = [...selectedTables.values()];
+            selectedList.innerHTML = tableNames.map(name => `<span class="badge bg-secondary me-1">${name}</span>`).join('');
+            placeOrderBtn.disabled = false;
+        }
+        selectedInput.value = [...selectedTables.keys()].join(',');
+    }
+});
+</script>
+{% endblock %}
