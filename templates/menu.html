@@ -1,65 +1,120 @@
 {% extends "base.html" %}
+
 {% block title %}Manage Menu{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Menu Items</h1>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMenuItemModal"><i class="bi bi-plus-circle"></i> Add Menu Item</button>
+
+<div class="row">
+    <!-- Left Column: Menu Categories -->
+    <div class="col-lg-4">
+        <h1 class="h3 mb-3">Categories</h1>
+        <div class="card">
+            <div class="card-body">
+                <form action="{{ url_for('add_menu_category') }}" method="POST" class="mb-3">
+                    <div class="input-group">
+                        <input type="text" name="category_name" class="form-control" placeholder="New category name" required>
+                        <button class="btn btn-primary" type="submit">Add</button>
+                    </div>
+                </form>
+                <hr>
+                <ul class="list-group">
+                    {% for category in categories %}
+                        <li class="list-group-item">{{ category.name }}</li>
+                    {% else %}
+                        <li class="list-group-item text-muted">No categories yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Menu Items -->
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3">Menu Items</h1>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMenuItemModal">
+                <i class="bi bi-plus-circle"></i> Add Menu Item
+            </button>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in menu_items %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.name }}</td>
+                            <td>${{ "%.2f"|format(item.price) }}</td>
+                            <td><span class="badge bg-secondary">{{ item.category.name }}</span></td>
+                            <td>{{ item.description }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">No menu items found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Add Menu Item Modal -->
+
+<!-- Add New Menu Item Modal -->
 <div class="modal fade" id="addMenuItemModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST">
+            <form action="{{ url_for('manage_menu') }}" method="POST">
                 <div class="modal-header">
                     <h5 class="modal-title">Add New Menu Item</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Name</label>
-                        <input type="text" class="form-control" name="name" required>
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Price</label>
-                        <input type="number" step="0.01" class="form-control" name="price" required>
+                        <label for="price" class="form-label">Price</label>
+                        <input type="number" step="0.01" class="form-control" id="price" name="price" required>
                     </div>
+                    
+                    <!-- FIX: Added the missing Category dropdown -->
                     <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" name="description" rows="3"></textarea>
+                        <label for="category_id" class="form-label">Category</label>
+                        <select class="form-select" id="category_id" name="category_id" required>
+                            <option value="" disabled selected>-- Select a Category --</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                         {% if not categories %}
+                            <div class="form-text text-danger">You must add a category first before adding items.</div>
+                         {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" name="description" id="description" rows="3"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Add Item</button>
+                    <button type="submit" class="btn btn-primary" {% if not categories %}disabled{% endif %}>Add Item</button>
                 </div>
             </form>
         </div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-body">
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in menu_items %}
-                <tr>
-                    <td>{{ item.id }}</td>
-                    <td>{{ item.name }}</td>
-                    <td>${{ "%.2f"|format(item.price) }}</td>
-                    <td>{{ item.description }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
 </div>
 {% endblock %}
