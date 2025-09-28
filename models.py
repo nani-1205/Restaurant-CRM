@@ -9,7 +9,10 @@ class User(UserMixin, db.Model):
     """User model for authentication."""
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    
+    # FIX: Increased length from 128 to 256 to accommodate modern password hashes.
+    password_hash = db.Column(db.String(256), nullable=False)
+    
     role = db.Column(db.String(80), nullable=False, default='Cashier') # e.g., Admin, Cashier
 
     def set_password(self, password):
