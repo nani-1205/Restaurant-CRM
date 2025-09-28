@@ -23,7 +23,6 @@ def calculate_order_total(order_id):
 
 @app.route('/')
 def dashboard():
-    # ... (no changes to this route)
     total_sales = db.session.query(func.sum(Order.total_price)).filter(Order.status == 'Paid').scalar() or 0.0
     total_orders = Order.query.count()
     employee_count = Employee.query.count()
@@ -31,13 +30,13 @@ def dashboard():
     recent_orders = Order.query.order_by(Order.order_time.desc()).limit(5).all()
     return render_template('dashboard.html', total_sales=total_sales, total_orders=total_orders, employee_count=employee_count, low_stock_items=low_stock_items, recent_orders=recent_orders)
 
-# --- NEW: Add Order Visual Layout Route ---
+# --- Add Order Visual Layout Route ---
 @app.route('/add-order')
 def add_order_layout():
     tables = Table.query.order_by(Table.name).all()
     return render_template('add_order.html', tables=tables)
 
-# --- NEW: Table Management Route ---
+# --- Table Management Route ---
 @app.route('/tables', methods=['GET', 'POST'])
 def manage_tables():
     if request.method == 'POST':
@@ -67,15 +66,30 @@ def manage_tables():
     tables = Table.query.order_by(Table.id).all()
     return render_template('tables.html', tables=tables)
 
+# --- NEW: Route to delete a table ---
+@app.route('/tables/delete/<int:table_id>', methods=['POST'])
+def delete_table(table_id):
+    table_to_delete = Table.query.get_or_404(table_id)
+    
+    # Safety check: prevent deleting an occupied table
+    if table_to_delete.status != 'Available':
+        flash(f'Cannot delete table {table_to_delete.name} while it is occupied or reserved.', 'danger')
+        return redirect(url_for('manage_tables'))
+        
+    db.session.delete(table_to_delete)
+    db.session.commit()
+    flash(f'Table {table_to_delete.name} deleted successfully.', 'success')
+    return redirect(url_for('manage_tables'))
 
-# --- UPDATED: The old /orders is now /order-list ---
+
+# --- The old /orders is now /order-list ---
 @app.route('/order-list')
 def order_list():
     orders = Order.query.order_by(Order.order_time.desc()).all()
     return render_template('order_list.html', orders=orders)
 
 
-# --- UPDATED: Combined order creation logic ---
+# --- Combined order creation logic ---
 @app.route('/create-order', methods=['GET', 'POST'])
 def create_order():
     if request.method == 'POST':
@@ -143,7 +157,7 @@ def update_order_status(order_id):
     order = Order.query.get_or_404(order_id)
     new_status = request.form['status']
     if new_status:
-        # --- LOGIC TO FREE UP TABLES ---
+        # LOGIC TO FREE UP TABLES
         if new_status in ['Paid', 'Cancelled']:
             for table in order.tables:
                 table.status = 'Available'
@@ -154,8 +168,7 @@ def update_order_status(order_id):
     return redirect(url_for('order_list'))
 
 
-# --- Other routes (employees, inventory, menu, reports) remain unchanged ---
-# ...
+# --- Other routes (employees, inventory, menu, reports) ---
 @app.route('/employees', methods=['GET', 'POST'])
 def manage_employees():
     if request.method == 'POST':
@@ -213,7 +226,6 @@ def manage_menu():
 
 @app.route('/reports')
 def reports():
-    # Employee Performance Report
     employee_performance = db.session.query(
         Employee.name,
         func.count(Order.id).label('total_orders'),

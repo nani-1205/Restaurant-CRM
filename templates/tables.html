@@ -32,14 +32,26 @@
                         </select>
                     </div>
                     <hr>
-                    <p class="text-muted">Set grid position (e.g., in a 10x10 grid):</p>
+                    <p class="text-muted">Set grid position (e.g., in a 12-column grid):</p>
                     <div class="row">
-                        <div class="col"><label>X Pos (Column)</label><input type="number" name="pos_x" class="form-control" required min="1"></div>
-                        <div class="col"><label>Y Pos (Row)</label><input type="number" name="pos_y" class="form-control" required min="1"></div>
+                        <div class="col">
+                            <label for="pos_x" class="form-label">X Pos (Column)</label>
+                            <input type="number" id="pos_x" name="pos_x" class="form-control" required min="1">
+                        </div>
+                        <div class="col">
+                            <label for="pos_y" class="form-label">Y Pos (Row)</label>
+                            <input type="number" id="pos_y" name="pos_y" class="form-control" required min="1">
+                        </div>
                     </div>
                     <div class="row mt-2">
-                        <div class="col"><label>X Span (Width)</label><input type="number" name="span_x" class="form-control" value="1" min="1"></div>
-                        <div class="col"><label>Y Span (Height)</label><input type="number" name="span_y" class="form-control" value="1" min="1"></div>
+                        <div class="col">
+                            <label for="span_x" class="form-label">X Span (Width)</label>
+                            <input type="number" id="span_x" name="span_x" class="form-control" value="1" min="1">
+                        </div>
+                        <div class="col">
+                            <label for="span_y" class="form-label">Y Span (Height)</label>
+                            <input type="number" id="span_y" name="span_y" class="form-control" value="1" min="1">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -53,9 +65,17 @@
 
 <div class="card">
     <div class="card-body">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover align-middle">
             <thead>
-                <tr><th>ID</th><th>Name</th><th>Shape</th><th>Grid Position (X, Y)</th><th>Grid Span (X, Y)</th><th>Status</th></tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Shape</th>
+                    <th>Grid Position (X, Y)</th>
+                    <th>Grid Span (X, Y)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
             </thead>
             <tbody>
                 {% for table in tables %}
@@ -66,6 +86,14 @@
                     <td>{{ table.pos_x }}, {{ table.pos_y }}</td>
                     <td>{{ table.span_x }}, {{ table.span_y }}</td>
                     <td>{{ table.status }}</td>
+                    <td>
+                        <!-- Delete Form for each table -->
+                        <form action="{{ url_for('delete_table', table_id=table.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this table?');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Table">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
