@@ -14,13 +14,35 @@ app.config.from_object(Config)
 
 # Database & Login Manager Initialization
 db.init_app(app)
-migrate = Migrate(app, db)
+migrate = Migrate(app, db) # Kept for potential future manual schema changes
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'  # Redirect to /login if user is not authenticated
+login_manager.login_view = 'login' # Redirect to /login if user is not authenticated
+
+# ==============================================================================
+# === AUTOMATIC DATABASE & ADMIN USER CREATION ===
+# ==============================================================================
+# This block ensures that the necessary database tables and a default admin
+# user are created when the application starts, if they don't already exist.
+with app.app_context():
+    print("Checking database schema...")
+    # Creates tables for all models defined in models.py if they don't exist.
+    db.create_all()
+    print("Database schema checked/created.")
+
+    # Create a default admin user if one doesn't exist
+    if not User.query.filter_by(username='admin').first():
+        print("Admin user not found, creating one...")
+        admin_user = User(username='admin', role='Admin')
+        admin_user.set_password('admin123') # CHANGE THIS in a real production environment
+        db.session.add(admin_user)
+        db.session.commit()
+        print("Default admin user created with username 'admin' and password 'admin123'.")
+# ==============================================================================
 
 @login_manager.user_loader
 def load_user(user_id):
+    """Flask-Login helper to load a user from the database."""
     return User.query.get(int(user_id))
 
 # --- Authentication Routes ---
@@ -158,7 +180,7 @@ def api_create_order():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-# --- Management Routes (All protected) ---
+# --- Management Routes ---
 
 @app.route('/order-list')
 @login_required
@@ -185,43 +207,119 @@ def update_order_status(order_id):
 @login_required
 def manage_tables():
     if request.method == 'POST':
-        # (Add your logic for adding a table here)
-        flash('Table added successfully!', 'success')
+        name = request.form.get('name')
+        shape = request.form.get('shape')
+        pos_x = request.form.get('pos_x')
+        pos_y = request.form.get('pos_y')
+        span_x = request.form.get('span_x', 1)
+        span_y = request.form.get('span_y', 1)
+        if all([name, shape, pos_x, pos_y]):
+            new_table = Table(name=name, shape=shape, pos_x=int(pos_x), pos_y=int(pos_y), span_x=int(span_x), span_y=int(span_y))
+            db.session.add(new_table)
+            db.session.commit()
+            flash(f"Table '{name}' added successfully.", 'success')
+        else:
+            flash('All fields are required.', 'danger')
         return redirect(url_for('manage_tables'))
+
     tables = Table.query.order_by(Table.id).all()
     return render_template('tables.html', tables=tables)
 
 @app.route('/tables/delete/<int:table_id>', methods=['POST'])
 @login_required
 def delete_table(table_id):
-    # (Add your logic for deleting a table here)
-    flash(f'Table deleted successfully.', 'success')
+    table = Table.query.get_or_404(table_id)
+    if table.status != 'Available':
+        flash(f"Cannot delete table {table.name} while it is occupied.", 'danger')
+    else:
+        db.session.delete(table)
+        db.session.commit()
+        flash(f'Table {table.name} deleted successfully.', 'success')
     return redirect(url_for('manage_tables'))
 
-# Add the remaining management routes here, each with the @login_required decorator
 @app.route('/employees', methods=['GET', 'POST'])
 @login_required
 def manage_employees():
-    # (Your previous code for managing employees)
-    pass
+    if request.method == 'POST':
+        name = request.form.get('name')
+        role = request.form.get('role')
+        if name and role:
+            new_employee = Employee(name=name, role=role)
+            db.session.add(new_employee)
+            db.session.commit()
+            flash('Employee added successfully!', 'success')
+        else:
+            flash('Name and role are required.', 'danger')
+        return redirect(url_for('manage_employees'))
+        
+    employees = Employee.query.all()
+    return render_template('employees.html', employees=employees)
 
 @app.route('/inventory', methods=['GET', 'POST'])
 @login_required
 def manage_inventory():
-    # (Your previous code for managing inventory)
-    pass
+    if request.method == 'POST':
+        name = request.form.get('name')
+        quantity = request.form.get('quantity')
+        unit = request.form.get('unit')
+        low_stock_threshold = request.form.get('low_stock_threshold')
+        if all([name, quantity, unit, low_stock_threshold]):
+            new_item = InventoryItem(name=name, quantity=float(quantity), unit=unit, low_stock_threshold=float(low_stock_threshold))
+            db.session.add(new_item)
+            db.session.commit()
+            flash('Inventory item added successfully!', 'success')
+        else:
+            flash('All fields are required.', 'danger')
+        return redirect(url_for('manage_inventory'))
+        
+    inventory = InventoryItem.query.all()
+    return render_template('inventory.html', inventory=inventory)
 
 @app.route('/menu', methods=['GET', 'POST'])
 @login_required
 def manage_menu():
-    # (Your previous code for managing menu items and categories)
-    pass
+    if request.method == 'POST':
+        # Logic to add a menu item
+        name = request.form.get('name')
+        price = request.form.get('price')
+        category_id = request.form.get('category_id')
+        if all([name, price, category_id]):
+            new_item = MenuItem(name=name, price=Decimal(price), category_id=int(category_id))
+            db.session.add(new_item)
+            db.session.commit()
+            flash('Menu item added successfully!', 'success')
+        else:
+            flash('Name, price, and category are required.', 'danger')
+        return redirect(url_for('manage_menu'))
+
+    menu_items = MenuItem.query.all()
+    categories = MenuCategory.query.all()
+    return render_template('menu.html', menu_items=menu_items, categories=categories)
+
+@app.route('/menu/category', methods=['POST'])
+@login_required
+def add_menu_category():
+    name = request.form.get('category_name')
+    if name:
+        new_category = MenuCategory(name=name)
+        db.session.add(new_category)
+        db.session.commit()
+        flash('Category added successfully!', 'success')
+    else:
+        flash('Category name is required.', 'danger')
+    return redirect(url_for('manage_menu'))
+
 
 @app.route('/reports')
 @login_required
 def reports():
-    # (Your previous code for reports)
-    pass
+    employee_performance = db.session.query(
+        Employee.name,
+        func.count(Order.id).label('total_orders'),
+        func.sum(Order.total_price).label('total_sales')
+    ).join(Order, Employee.id == Order.employee_id).group_by(Employee.name).order_by(func.sum(Order.total_price).desc()).all()
+
+    return render_template('reports.html', employee_performance=employee_performance)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
