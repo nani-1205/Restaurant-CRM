@@ -1,86 +1,200 @@
+/* Import a nice font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-    --color-available: #d1e7dd;
-    --color-available-border: #a3cfbb;
-    --color-occupied: #f8d7da;
-    --color-occupied-border: #f1aeb5;
-    --color-reserved: #cfe2ff;
-    --color-reserved-border: #a9c7fe;
-    --color-selected-border: #6f42c1;
+    --sidebar-bg: #1a1d24;
+    --main-bg: #f3f4f8;
+    --primary-color: #6a5acd;
+    --primary-hover: #5d4ec3;
+    --text-color: #333;
+    --text-muted: #6c757d;
+    --card-bg: #ffffff;
+    --card-border: #e9ecef;
 }
 
 body {
-    padding-bottom: 80px; /* Space for the bottom bar */
+    font-family: 'Inter', sans-serif;
+    background-color: var(--main-bg);
+    color: var(--text-color);
 }
 
-/* Table Layout Grid */
-.table-layout-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr); /* A 12-column grid */
-    grid-template-rows: repeat(8, 70px);   /* 8 rows, each 70px high */
-    gap: 15px;
-    background-color: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
-}
-
-.table-container {
+/* --- Login Page --- */
+.login-body {
     display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--main-bg);
+}
+.login-container {
+    display: flex;
+    width: 900px;
+    height: 600px;
+    background-color: var(--card-bg);
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+.login-form-wrapper {
+    flex: 1;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.login-art-wrapper {
+    flex: 1;
+    background-color: #e9e6ff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+/* --- Main App Layout --- */
+.page-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+.sidebar {
+    width: 260px;
+    background: var(--sidebar-bg);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.sidebar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+}
+.sidebar-brand i { margin-right: 0.5rem; }
+.sidebar-nav {
+    flex-grow: 1;
+    list-style: none;
+    padding: 1rem 0;
+}
+.sidebar-link {
+    display: block;
+    padding: 0.75rem 1.5rem;
+    color: #adb5bd;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.sidebar-link i { margin-right: 1rem; }
+.sidebar-item.active > .sidebar-link, .sidebar-link:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.05);
+}
+.sidebar-dropdown {
+    background: rgba(0,0,0,0.2);
+}
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.main-content {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-radius: 0.5rem;
+}
+
+/* --- POS View --- */
+.pos-container {
+    display: flex;
+    gap: 1.5rem;
+    height: calc(100vh - 5rem); /* Adjust based on your header/padding */
+}
+
+/* POS Tables Grid */
+.pos-tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    flex-grow: 1;
+}
+.pos-table {
+    aspect-ratio: 1 / 1;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 3px solid transparent;
-    border-radius: 12px;
+    transition: all 0.2s ease;
+    border: 1px solid var(--card-border);
 }
-.table-container:not(.disabled):hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+.pos-table:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
-.table-container.selected {
-    border-color: var(--color-selected-border);
-    background-color: rgba(111, 66, 193, 0.1);
-}
-.table-container.disabled {
-    cursor: not-allowed;
-}
+.pos-table-name { font-size: 1.5rem; font-weight: 600; }
+.pos-table-status { font-size: 0.8rem; text-transform: uppercase; }
+.status-available { background-color: #d1e7dd; }
+.status-occupied { background-color: #f8d7da; cursor: not-allowed; opacity: 0.7; }
 
-.table-shape {
-    width: 100%;
-    height: 100%;
+/* POS Order View */
+.pos-order-view {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    color: #333;
-    background-color: white;
-    border: 1px solid #ccc;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-/* Shapes */
-.table-shape.square, .table-shape.rectangle { border-radius: 8px; }
-.table-shape.circle { border-radius: 50%; }
-.table-shape.oval { border-radius: 50%; }
-
-/* Status Colors */
-.text-available { color: #198754; }
-.text-occupied { color: #dc3545; }
-.text-reserved { color: #0d6efd; }
-
-.status-available .table-shape { background-color: var(--color-available); border-color: var(--color-available-border); }
-.status-occupied .table-shape { background-color: var(--color-occupied); border-color: var(--color-occupied-border); }
-.status-reserved .table-shape { background-color: var(--color-reserved); border-color: var(--color-reserved-border); }
-
-/* Bottom Bar */
-.order-summary-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
     width: 100%;
-    height: 70px;
-    background-color: #fff;
-    border-top: 1px solid #dee2e6;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    z-index: 1000;
+    gap: 1.5rem;
+}
+.pos-menu-section {
+    flex-basis: 60%;
+    display: flex;
+    flex-direction: column;
+}
+.pos-order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.pos-menu-items {
+    flex-grow: 1;
+    overflow-y: auto;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+.pos-menu-category h5 {
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 0.5rem;
+    margin-top: 1rem;
+}
+.pos-menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+}
+.pos-cart-section {
+    flex-basis: 40%;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+}
+.pos-cart-items-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+.pos-cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
 }

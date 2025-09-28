@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <!-- ... (head content is unchanged) ... -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Restaurant CRM{% endblock %}</title>
@@ -9,62 +8,67 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
-                <i class="bi bi-egg-fried"></i> Restaurant CRM
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-                    
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                           <i class="bi bi-receipt"></i> Cashier
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('add_order_layout') }}">Add Order</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('order_list') }}">Order List</a></li>
-                        </ul>
-                    </li>
-                    
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_employees') }}"><i class="bi bi-people-fill"></i> Employees</a></li>
-                    
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                           <i class="bi bi-database-fill"></i> Master Data
-                        </a>
-                        <ul class="dropdown-menu">
-                             <li><a class="dropdown-item" href="{{ url_for('manage_tables') }}">Tables</a></li>
-                             <li><a class="dropdown-item" href="{{ url_for('manage_menu') }}">Menu</a></li>
-                             <li><a class="dropdown-item" href="{{ url_for('manage_inventory') }}">Inventory</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('reports') }}"><i class="bi bi-bar-chart-line-fill"></i> Reports</a></li>
-                </ul>
+<body>
+    <div class="page-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-brand">
+                    <i class="bi bi-egg-fried"></i>
+                    <span>RestroCRM</span>
+                </a>
             </div>
-        </div>
-    </nav>
-    
-    <main class="container-fluid mt-4 px-4">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <ul class="sidebar-nav">
+                <li class="sidebar-item {% if 'dashboard' in request.path %}active{% endif %}">
+                    <a href="{{ url_for('dashboard') }}" class="sidebar-link"><i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span></a>
+                </li>
+                <li class="sidebar-item {% if 'pos' in request.path %}active{% endif %}">
+                    <a href="{{ url_for('pos') }}" class="sidebar-link"><i class="bi bi-display"></i><span>POS View</span></a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{ url_for('order_list') }}" class="sidebar-link"><i class="bi bi-receipt"></i><span>Orders</span></a>
+                </li>
+                 <li class="sidebar-item">
+                    <a href="{{ url_for('manage_employees') }}" class="sidebar-link"><i class="bi bi-people"></i><span>Employees</span></a>
+                </li>
+                <li class="sidebar-item">
+                     <a class="sidebar-link" data-bs-toggle="collapse" href="#masterDataCollapse" role="button">
+                        <i class="bi bi-database-fill"></i><span>Master Data</span>
+                    </a>
+                    <div class="collapse" id="masterDataCollapse">
+                        <ul class="sidebar-dropdown list-unstyled">
+                            <li class="sidebar-item"><a href="{{ url_for('manage_tables') }}" class="sidebar-link">Tables</a></li>
+                            <li class="sidebar-item"><a href="{{ url_for('manage_menu') }}" class="sidebar-link">Menu</a></li>
+                            <li class="sidebar-item"><a href="{{ url_for('manage_inventory') }}" class="sidebar-link">Inventory</a></li>
+                        </ul>
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+                </li>
+                 <li class="sidebar-item">
+                    <a href="{{ url_for('reports') }}" class="sidebar-link"><i class="bi bi-bar-chart-line"></i><span>Reports</span></a>
+                </li>
+            </ul>
+             <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}" class="sidebar-link text-danger"><i class="bi bi-box-arrow-left"></i><span>Logout</span></a>
+            </div>
+        </aside>
 
-        {% block content %}{% endblock %}
-    </main>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container-fluid p-4">
+                 {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     {% block scripts %}{% endblock %}
